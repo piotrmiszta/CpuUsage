@@ -51,7 +51,7 @@ int loggerPrint(Data* data) {
             break;
         case(PDOUBLE):
             fprintf(log->file, "%s ",log->msg);
-            for(int i = 0; i < data->amountCpu; i++){
+            for(int i = 0; i < data->amountCpu - 1; i++){
                 fprintf(log->file, "%f ", ((double*)(log->arg))[i]);
             }
             break;
@@ -60,8 +60,13 @@ int loggerPrint(Data* data) {
             cpu* cpus = log->arg;
             if(cpus == NULL){
                 fprintf(log->file, "NULL");
+                break;
             }
-            for(int i = 0; i < cpus->size; i++) {
+            if(cpus->tab == NULL) {
+                fprintf(log->file, "NULL");
+                break;
+            }
+            for(int i = 0; i < cpus->size ; i++) {
                 fprintf(log->file, "%s %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld\n", cpus->tab[i].name, cpus->tab[i].user, cpus->tab[i].nice, cpus->tab[i].system,
                         cpus->tab[i].idle, cpus->tab[i].iowait , cpus->tab[i].irq, cpus->tab[i].softirq, cpus->tab[i].steal, cpus->tab[i].guest, cpus->tab[i].guest_nice);
             }
@@ -116,11 +121,13 @@ int closeLogger(Data* data) {
 }
 void* loggerThread(void* arg) {
     Data* data = (Data*)(arg);
-    while(1) {
+    while(data->end!=1) {
         sem_wait(&data->semLogFull);
         pthread_mutex_lock(&data->mutexLogBuffer);
         loggerPrint(data);
         pthread_mutex_unlock(&data->mutexLogBuffer);
         sem_post(&data->semLogEmpty);
     }
+    data->loggerEnd= 1;
+    return SUCCESS;
 }

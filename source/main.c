@@ -10,19 +10,25 @@
 #include "../include/Analyzer.h"
 #include "../include/Printer.h"
 #include "../include/Logger.h"
+#include <signal.h>
+
+Data* data;
+void term(int sig) {
+    data->end = 1;
+    while(data->printerEnd != 1 && data->loggerEnd != 1 && data->readerEnd != 1 && data->analyzerEnd != 1) {}
+    closeData(data);
+
+
+}
 int main(int argc, char* argv[]) {
+    struct sigaction action;
+    memset(&action, 0 , sizeof (struct sigaction));
+    action.sa_handler = term;
+    sigaction(SIGTERM, &action, NULL);
+    sigaction(SIGINT, &action, NULL);
 
-    srand(time(NULL));
+    data=createData();
 
-    Data* data = malloc(sizeof(Data));
-    data->readerTab = malloc(sizeof (Node));
-    data->readerTab->data = NULL;
-    data->analyzerTab = malloc(sizeof(Node));
-    data->analyzerTab->data = NULL;
-    data->end = 0;
-    data->amountCpu = readAmountOfCpu();
-    data->logger = malloc(sizeof(Logger));
-    loggerInit("log.txt", data->logger);
     pthread_t th, th2, th3, th4;
     pthread_mutex_init(&data->mutexReadBuffer, NULL);
     pthread_mutex_init(&data->mutexAnalyzeBuffer, NULL);
@@ -40,23 +46,16 @@ int main(int argc, char* argv[]) {
     pthread_create(&th2, NULL, analyzerThread, data);
     pthread_create(&th3, NULL, printerThread, data);
     pthread_create(&th4, NULL, loggerThread, data);
+    sleep(10);
+    term(1);
 
-    sleep(2);
-    data->end = 1;
+
     pthread_join(th, NULL);
     pthread_join(th2, NULL);
     pthread_join(th3, NULL);
     pthread_join(th4, NULL);
+    closeData(data);
 
 
-    sem_destroy(&data->semReadEmpty);
-    sem_destroy(&data->semReadFull);
-    sem_destroy(&data->semAnalyzeEmpty);
-    sem_destroy(&data->semAnalyzeFull);
-
-    pthread_mutex_destroy(&data->mutexReadBuffer);
-    pthread_mutex_destroy(&data->mutexAnalyzeBuffer);
-
-    free(data);
     return 0;
 }

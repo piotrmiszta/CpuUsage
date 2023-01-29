@@ -5,17 +5,20 @@
 #include "unistd.h"
 void* readerThread(void* args) {
     Data* data = (Data*)(args);
-    while (1) {
+    while (data->end != 1) {
         cpu* _cpu = malloc(sizeof (cpu));
-        //sleep(1);
+        sleep(1);
         getStats(_cpu, data->amountCpu);
         LOG_DEBUG(data,"Readed cpu is: ", _cpu, CPU);
         sem_wait(&data->semReadEmpty);
         pthread_mutex_lock(&data->mutexReadBuffer);
-        pushBackCpu(data->readerTab, (void*)(_cpu));
+        pushBack(data->readerTab, (void *) (_cpu));
         pthread_mutex_unlock(&data->mutexReadBuffer);
         sem_post(&data->semReadFull);
     }
+    sem_post(&data->semAnalyzeEmpty);
+    data->readerEnd = 1;
+    sem_post(&data->semReadFull);
     return NULL;
 }
 int readAmountOfCpu() {
@@ -79,4 +82,19 @@ int getStats(cpu* cpu, int cpuAmount) {
     }
     fclose(file);
     return SUCCESS;
+}
+void freeCpu(void** _cpu) {
+    cpu** cpu2 = (cpu**)(_cpu);
+    cpu* temp = (*cpu2);
+    if(temp == NULL){
+        return;
+    }
+    else {
+        if(temp->tab != NULL) {
+            free(temp->tab);
+            temp->tab = NULL;
+        }
+        free(temp);
+        (*cpu2) = NULL;
+    }
 }

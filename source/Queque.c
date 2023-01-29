@@ -4,13 +4,13 @@
 #include "../include/Queque.h"
 #include <stdio.h>
 #include <stdlib.h>
-void pushBackCpu(Node* head, void* _node) {
+void pushBack(Node* head, void* data) {
     if(head == NULL) {
         perror("head is null pointer");
         return;
     }
     if(head->data == NULL) {
-        head->data = _node;
+        head->data = data;
         return;
     }
     Node* temp = head;
@@ -18,11 +18,11 @@ void pushBackCpu(Node* head, void* _node) {
         temp = temp->next;
     }
     Node * newNode = malloc(sizeof(Node));
-    newNode->data = _node;
+    newNode->data = data;
     temp->next = newNode;
     newNode->next = NULL;
 }
-void* popFirstCpu(Node** head) {
+void* pop(Node** head) {
     if(head == NULL) {
         return NULL;
     }
