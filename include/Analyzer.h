@@ -10,6 +10,7 @@
 #include "Reader.h"
 #include "defs.h"
 #include "Logger.h"
+
 void* analyzerThread(void* args);
 double* getPercent(cpu* prev, cpu* next);
 

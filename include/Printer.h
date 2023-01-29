@@ -9,8 +9,8 @@
 #include "data.h"
 #include "defs.h"
 #include "Logger.h"
-void* printerThread(void* arg);
 
+void* printerThread(void* arg);
 double* getDouble(void* arg);
 
 

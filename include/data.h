@@ -27,7 +27,8 @@ typedef struct Data {
 
     void* logger;
     int amountCpu;
-    int end;
+    int end, readerEnd, analyzerEnd, printerEnd,loggerEnd;
 }Data;
-
+Data* createData();
+void closeData(Data* data);
 #endif //STATCPU_DATA_H

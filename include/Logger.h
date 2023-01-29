@@ -26,7 +26,7 @@ typedef enum valType{
     NONE
 }valType;
 typedef struct Logger{
-    char* msg; //tab of arguments
+    char* msg;
     void* arg;
     valType valtype;
     LogType type;

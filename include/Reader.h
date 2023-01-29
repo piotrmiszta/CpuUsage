@@ -35,5 +35,6 @@ void* readerThread(void* args);
 int readAmountOfCpu();
 int getOneCpu(oneCpu* stat, FILE* file);
 int getStats(cpu* cpu, int amount);
+void freeCpu(void** cpu);
 
 #endif //STATCPU_READER_H

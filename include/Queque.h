@@ -13,8 +13,9 @@ typedef struct Node{
 
 }Node;
 
-void pushBackCpu(Node* head, void* data);
-void* popFirstCpu(Node** head);
+
+void pushBack(Node* head, void* data);
+void* pop(Node** head);
 void printAll(Node* head);
 int elements(Node* head);
 
